@@ -5,7 +5,7 @@ local t = 0.6
 local s = redstone.getSides()
 
 function saveT()
-	file = fs.open("timerTime","w")
+	file = fs.open("timer.conf","w")
 	file.write(tostring(t))
 	file.close()
 end
@@ -163,8 +163,8 @@ function changeTKey(key)
 	printTimer()
 end
 
-if fs.exists("timerTime") then
-	file = fs.open("timerTime","r")
+if fs.exists("timer.conf") then
+	file = fs.open("timer.conf","r")
 	t = tonumber(file.readAll())
 	file.close()
 else
