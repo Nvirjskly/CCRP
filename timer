@@ -24,7 +24,7 @@ function printTimer()
 	if not term.isColor() then
 		term.clear()
 		term.setCursorPos(1,1)
-		term.write("Timer: " .. timerString .. " seconds")
+		term.write(timerString)
 		term.setCursorPos(1,2)
 		term.write("Up arrow +0.05")
 		term.setCursorPos(1,3)
@@ -173,7 +173,7 @@ end
 if fs.exists("timer.conf") then
 	file = fs.open("timer.conf","r")
 	cfg = conf.parseConf(file.readAll())
-	if not cfg["timer"]["interval"] then
+	if not cfg["timer"] then
 		file.close()
 		saveT()
 		file = fs.open("timer.conf","r")

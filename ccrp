@@ -1,0 +1,11 @@
+--(c) Nvirjskly 2013
+--
+
+RedObj = {}
+romt = {}
+
+function RedObj:new() {
+	local inst = {}
+	setmetatable(inst, romt)
+	return inst
+}
