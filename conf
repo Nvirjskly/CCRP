@@ -31,6 +31,17 @@ function parseConf(str)
 	return tab
 end
 
+function confToString(tab)
+	str = ""
+	for secName, section in pairs(tab) do
+		str = str.."["..secName.."]\n"
+		for var,val in pairs(section) do
+			str = str..var.."="..val.."\n"
+		end
+	end
+	return str
+end
+
 --From lua docs
 function lines(str)
 	ls = {}
@@ -42,3 +53,6 @@ end
 gg = parseConf("[section1]\nletter=notaletter")
 
 print(gg["section1"]["letter"])
+
+print(confToString(gg))
+
