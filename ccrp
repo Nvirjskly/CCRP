@@ -1,11 +1,47 @@
 --(c) Nvirjskly 2013
 --
 
+circuit = {}
+
+
+
+
 RedObj = {}
 romt = {}
 
-function RedObj:new() {
+function RedObj:new() 
 	local inst = {}
 	setmetatable(inst, romt)
 	return inst
-}
+end
+
+
+--Returns the state of the redstone
+function RedObj:isOn() 
+	return false;
+end
+
+function RedObj:display()
+	term.setBackgroundColor(colors.black)
+	if self.isOn() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
+end
+
+
+
+
+
+
+--main loop
+
+function globalTicks()
+	return os.time() * 1000
+end
+
+while 1 do
+	startTicks = globalTicks()
+	--do stuff
+	
+	while globalTicks() == startTicks then
+		sleep(0.01)
+	end	
+end
