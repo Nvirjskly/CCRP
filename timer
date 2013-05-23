@@ -3,10 +3,17 @@
 
 local t = 0.6
 local s = redstone.getSides()
+local cfg = {}
+os.loadAPI("conf")
 
 function saveT()
 	file = fs.open("timer.conf","w")
-	file.write(tostring(t))
+	if not cfg["timer"] then
+		cfg = {}
+		cfg["timer"] = {}
+	end
+	cfg["timer"]["interval"] = tostring(t)
+	file.write(conf.confToString(cfg))
 	file.close()
 end
 
@@ -165,7 +172,13 @@ end
 
 if fs.exists("timer.conf") then
 	file = fs.open("timer.conf","r")
-	t = tonumber(file.readAll())
+	cfg = conf.parseConf(file.readAll())
+	if not cfg["timer"]["interval"] then
+		file.close()
+		saveT()
+		file = fs.open("timer.conf","r")
+	end
+	t = tonumber(cfg["timer"]["interval"])
 	file.close()
 else
 	saveT()

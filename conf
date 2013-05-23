@@ -50,9 +50,3 @@ function lines(str)
 	return ls
 end
 
-gg = parseConf("[section1]\nletter=notaletter")
-
-print(gg["section1"]["letter"])
-
-print(confToString(gg))
-
