@@ -1,33 +1,65 @@
 --(c) Nvirjskly 2013
 --
 
-circuit = {}
-
-
-
 
 RedObj = {}
-romt = {}
+--RedObj.__index = RedObj
 
 function RedObj:new() 
-	local inst = {}
-	setmetatable(inst, romt)
+	inst = {}
+	--setmetatable(inst, RedObj)
+	setmetatable(inst, self)
+	self.__index = self
+	inst.st = false;
 	return inst
 end
 
 
+
 --Returns the state of the redstone
-function RedObj:isOn() 
-	return false;
+function RedObj:state() 
+	return st;
 end
 
 function RedObj:display()
 	term.setBackgroundColor(colors.black)
-	if self.isOn() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
+	if self.state() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
+	term.write("+")
+end
+
+RedTorch = RedObj:new()
+
+RedTorch.__index = RedTorch
+
+function RedTorch:state()
+	st = true
+	return true
+end
+
+function RedTorch:display()
+	term.setBackgroundColor(colors.white)
+	term.setTextColor(colors.red)
+	term.write("O")
 end
 
 
 
+
+
+
+
+
+--TEST
+torch = RedTorch:new()
+local circuit = {torch}
+
+--Display the Circuit
+
+function ctDisplay()
+	term.clear()
+	term.setCursorPos(1,1)
+	torch:display()
+end
 
 
 
@@ -39,9 +71,11 @@ end
 
 while 1 do
 	startTicks = globalTicks()
-	--do stuff
 	
-	while globalTicks() == startTicks then
+	--do stuff
+	ctDisplay()
+	
+	while globalTicks() == startTicks do
 		sleep(0.01)
 	end	
 end
