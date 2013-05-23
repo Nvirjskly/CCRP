@@ -1,45 +1,91 @@
 --(c) Nvirjskly 2013
 --
 
-
-RedObj = {}
---RedObj.__index = RedObj
-
-function RedObj:new() 
-	inst = {}
-	--setmetatable(inst, RedObj)
-	setmetatable(inst, self)
-	self.__index = self
-	inst.st = false;
-	return inst
+function inherit(class)
+	local n = {}
+	function n.new()
+		local o = {}
+		setmetatable(o, {__index = n})
+		return o
+	end
+	if class then 
+		setmetatable(n,{__index=class})
+	end
+	return n
 end
+
+
+--RedObj = inherit(nil)
+--RedObj.st = false
+
+RedObj = inherit(nil)
+
+--function RedObj:new() 
+--	return setmetatable({st = false}, RedObj)
+--end
 
 
 
 --Returns the state of the redstone
 function RedObj:state() 
-	return st;
+	return self.st;
+end
+function RedObj:setState(s) 
+	self.st=s;
+end
+
+function RedObj:setInput(side)
+	
+	
 end
 
 function RedObj:display()
 	term.setBackgroundColor(colors.black)
-	if self.state() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
-	term.write("+")
+	if self:state() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
+	term.write("&")
 end
 
-RedTorch = RedObj:new()
+function RedObj:name()
+	return "RedObj"
+end
 
-RedTorch.__index = RedTorch
+RedObj.__index = RedObj
+
+
+
+
+
+RedTorch = inherit(RedObj)
+
+--RedTorch.__index = RedTorch
 
 function RedTorch:state()
-	st = true
 	return true
 end
 
 function RedTorch:display()
-	term.setBackgroundColor(colors.white)
-	term.setTextColor(colors.red)
-	term.write("O")
+	if self:state() then term.setBackgroundColor(colors.red) else term.setBackgroundColor(colors.white) end
+	if self:state() then term.setTextColor(colors.white) else term.setTextColor(colors.black) end
+	term.write("i")
+end
+
+
+
+RedWire = inherit(RedObj)
+--RedWire.__index = RedWire
+
+function RedWire:state()
+	return self.st
+end
+
+function RedWire:display()
+	if self:state() then term.setBackgroundColor(colors.red) else term.setBackgroundColor(colors.white) end
+	if self:state() then term.setTextColor(colors.white) else term.setTextColor(colors.black) end
+	term.write("+")
+end
+
+function RedWire:name()
+	return "RedWire"
 end
 
 
@@ -50,29 +96,69 @@ end
 
 
 --TEST
-torch = RedTorch:new()
-local circuit = {torch}
+local circuit = {{RedTorch.new()},{RedWire.new(),RedWire.new()}}
 
 --Display the Circuit
 
 function ctDisplay()
+	term.setBackgroundColor(colors.black)
 	term.clear()
 	term.setCursorPos(1,1)
-	torch:display()
+	for i = 1, #circuit do
+		for j = 1, #circuit[i] do
+			term.setCursorPos(j,i)
+			circuit[i][j]:display()
+		end
+	end
+end
+
+function ctUpdate()
+	for i = 1, #circuit do
+		for j = 1, #circuit[i] do
+			term.setCursorPos(j,i)
+			if circuit[i-1] then
+				if circuit[i-1][j] then
+					circuit[i-1][j]:setInput("front")
+				end
+			end
+			if circuit[i+1] then
+				if circuit[i+1][j] then
+					circuit[i+1][j]:setInput("back")
+				end
+			end
+			if circuit[i] then
+				if circuit[i][j-1] then
+					circuit[i][j-1]:setInput("left")
+				end
+			end
+			if circuit[i] then
+				if circuit[i][j+1] then
+					circuit[i][j+1]:setInput("right")
+				end
+			end
+		end
+	end
 end
 
 
+function cloneTable(t)
+	local new = {}
+	for k,v in pairs(t) do
+		--if
+	end
+end
 
 --main loop
 
 function globalTicks()
-	return os.time() * 1000
+	return (os.time() * 1000) + (24000 * (os.day()-1))
 end
 
 while 1 do
 	startTicks = globalTicks()
 	
 	--do stuff
+	ctUpdate()
 	ctDisplay()
 	
 	while globalTicks() == startTicks do
