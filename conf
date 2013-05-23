@@ -1,0 +1,44 @@
+--(c) Nvirjskly 2013
+--
+
+function parseConf(str)
+	section = "";
+	tab = {}
+	nstop = true
+	for i,line in ipairs(lines(str)) do
+		nstop = true
+		
+		w = line:match(';([%a%d]*)')
+		if w and nstop then
+			--Detects a comment and stops everything
+			nstop = false
+		end
+		
+		w = line:match('%[([%a%d]*)%]')
+		if w and nstop then
+			section = w;
+			tab[section] = {}
+			nstop = false
+		end
+		w,e = line:match('([%a%d]*)=([%a%d]*)')
+		--print(w)
+		if w and nstop then
+			tab[section][w] = e
+
+			nstop = false
+		end
+	end
+	return tab
+end
+
+--From lua docs
+function lines(str)
+	ls = {}
+	function h(l) table.insert(ls, l) return "" end
+	h((str:gsub("(.-)\r?\n", h)))
+	return ls
+end
+
+gg = parseConf("[section1]\nletter=notaletter")
+
+print(gg["section1"]["letter"])
