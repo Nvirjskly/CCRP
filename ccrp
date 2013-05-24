@@ -34,15 +34,21 @@ function RedObj:setState(s)
 	self.st=s;
 end
 
-function RedObj:setInput(side)
+function RedObj:setInput(side,value)
 	
 	
 end
 
+function RedObj:getOutput(side)
+	return false
+end
+
+
+
 function RedObj:display()
 	term.setBackgroundColor(colors.black)
 	if self:state() then term.setTextColor(colors.red) else term.setTextColor(colors.white) end
-	term.write("&")
+	term.write(" ")
 end
 
 function RedObj:name()
@@ -69,6 +75,10 @@ function RedTorch:display()
 	term.write("i")
 end
 
+function RedTorch:getOutput(side)
+	return true
+end
+
 
 
 RedWire = inherit(RedObj)
@@ -84,6 +94,16 @@ function RedWire:display()
 	term.write("+")
 end
 
+function RedWire:setInput(side,value)
+	if value then
+		self.st = value
+	end
+end
+
+function RedWire:getOutput(side)
+	return self.st
+end
+
 function RedWire:name()
 	return "RedWire"
 end
@@ -96,7 +116,7 @@ end
 
 
 --TEST
-local circuit = {{RedTorch.new()},{RedWire.new(),RedWire.new()}}
+local circuit = {{RedTorch.new()},{RedWire.new(),RedWire.new(), RedObj.new(), RedWire.new()}}
 
 --Display the Circuit
 
@@ -118,22 +138,22 @@ function ctUpdate()
 			term.setCursorPos(j,i)
 			if circuit[i-1] then
 				if circuit[i-1][j] then
-					circuit[i-1][j]:setInput("front")
+					circuit[i-1][j]:setInput("front",circuit[i][j]:getOutput("back"))
 				end
 			end
 			if circuit[i+1] then
 				if circuit[i+1][j] then
-					circuit[i+1][j]:setInput("back")
+					circuit[i+1][j]:setInput("back",circuit[i][j]:getOutput("front"))
 				end
 			end
 			if circuit[i] then
 				if circuit[i][j-1] then
-					circuit[i][j-1]:setInput("left")
+					circuit[i][j-1]:setInput("left",circuit[i][j]:getOutput("right"))
 				end
 			end
 			if circuit[i] then
 				if circuit[i][j+1] then
-					circuit[i][j+1]:setInput("right")
+					circuit[i][j+1]:setInput("right",circuit[i][j]:getOutput("left"))
 				end
 			end
 		end
