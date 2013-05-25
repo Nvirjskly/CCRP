@@ -1,6 +1,7 @@
 --(c) Nvirjskly 2013
 --
 
+--Emulates OOP
 function inherit(class)
 	local n = {}
 	function n.new()
@@ -15,15 +16,7 @@ function inherit(class)
 end
 
 
---RedObj = inherit(nil)
---RedObj.st = false
-
 RedObj = inherit(nil)
-
---function RedObj:new() 
---	return setmetatable({st = false}, RedObj)
---end
-
 
 
 --Returns the state of the redstone
@@ -43,6 +36,10 @@ function RedObj:getOutput(side)
 	return false
 end
 
+function RedObj:setOutsideOutput(side)
+	return false
+end
+
 
 
 function RedObj:display()
@@ -54,11 +51,6 @@ end
 function RedObj:name()
 	return "RedObj"
 end
-
-RedObj.__index = RedObj
-
-
-
 
 
 RedTorch = inherit(RedObj)
@@ -109,6 +101,82 @@ function RedWire:name()
 end
 
 
+RedTimer =inherit(RedObj)
+
+function RedTimer:state()
+	if not self.t then
+		self.t = 1.6 * 20
+	end
+	if not self.lt then
+		self.lt = globalTicks()
+	end
+	if (globalTicks() - self.lt) >= (self.t-6) then
+		self.st = true
+	end
+	if (globalTicks() - self.lt) >= self.t then
+		self.st = false
+		self.lt = globalTicks()
+	end
+	return self.st
+end
+
+function RedTimer:display()
+	if self:state() then term.setBackgroundColor(colors.red) else term.setBackgroundColor(colors.white) end
+	if self:state() then term.setTextColor(colors.white) else term.setTextColor(colors.black) end
+	term.write("T")
+end
+
+function RedTimer:setInput(side,value)
+	--if value then
+	--	self.st = value
+	--end
+end
+
+function RedTimer:getOutput(side)
+	return self:state()
+end
+
+function RedTimer:name()
+	return "RedTimer"
+end
+
+
+
+
+
+RedOutput = inherit(RedObj)
+
+function RedOutput:setOutsideOutput(side)
+	self.outputSide = side
+	return true
+end
+
+function RedOutput:display()
+	if self:state() then term.setBackgroundColor(colors.red) else term.setBackgroundColor(colors.white) end
+	if self:state() then term.setTextColor(colors.white) else term.setTextColor(colors.black) end
+	term.write("O")
+	rs.setOutput(self.outputSide,self:state())
+end
+
+function RedOutput:setInput(side,value)
+	if not self.input then
+		self.input = {left = false, right = false, back = false, front = false}
+	end
+	self.input[side] = value
+	self.st = false
+	for k,v in pairs(self.input) do
+		self.st = self.st or v
+	end
+end
+
+function RedOutput:getOutput(side)
+	return false
+end
+
+function RedOutput:state()
+	return self.st
+end
+
 
 
 
@@ -116,7 +184,10 @@ end
 
 
 --TEST
-local circuit = {{RedTorch.new()},{RedWire.new(),RedWire.new(), RedObj.new(), RedWire.new()}}
+otb = RedOutput.new()
+otb:setOutsideOutput("back")
+
+local circuit = {{RedTimer.new(),otb},{RedWire.new(),RedObj.new(), RedObj.new(), RedWire.new()},{RedWire.new()}}
 
 --Display the Circuit
 
