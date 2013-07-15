@@ -11,8 +11,10 @@ function saveT()
 	if not cfg["timer"] then
 		cfg = {}
 		cfg["timer"] = {}
+		cfg["redstone"] = {}
 	end
 	cfg["timer"]["interval"] = tostring(t)
+	cfg["redstone"]["side"] = "front"
 	file.write(conf.confToString(cfg))
 	file.close()
 end
@@ -97,15 +99,15 @@ function printTimer()
 end
 
 function timer()
-	if not redstone.getInput("front") then
+	if not redstone.getInput(cfg["redstone"]["side"]) then
 		for i = 1, #s do
-			if not (s[i] == "front") then
+			if not (s[i] == cfg["redstone"]["side"]) then
 				redstone.setOutput(s[i],true)
 			end
 		end
 		keyPress(0.2)
 		for i = 1, #s do
-			if not (s[i] == "front") then
+			if not (s[i] == cfg["redstone"]["side"]) then
 				redstone.setOutput(s[i],false)
 			end
 		end
